@@ -23,6 +23,18 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 with open('Myapp/models/fantasy_data.pkl', 'rb') as f:
     preprocessor = dill.load(f)
     
+IPL_TEAM_HOME_GROUNDS = {
+    "Chennai Super Kings": "MA Chidambaram Stadium, Chepauk, Chennai",
+    "Delhi Capitals": "Arun Jaitley Stadium, Delhi",
+    "Gujarat Titans": "Narendra Modi Stadium, Motera, Ahmedabad",
+    "Kolkata Knight Riders": "Eden Gardens, Kolkata",
+    "Lucknow Super Giants": "Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium, Lucknow",
+    "Mumbai Indians": "Wankhede Stadium, Mumbai",
+    "Punjab Kings": "Punjab Cricket Association IS Bindra Stadium, Mohali, Chandigarh",
+    "Rajasthan Royals": "Sawai Mansingh Stadium, Jaipur",
+    "Royal Challengers Bengaluru": "M.Chinnaswamy Stadium, Bengaluru",
+    "Sunrisers Hyderabad": "Rajiv Gandhi International Stadium, Uppal, Hyderabad"
+}
 
 ipl_2025_squads = {
     "Mumbai Indians": [
@@ -89,20 +101,57 @@ ipl_2025_squads = {
         "Harshit Rana", "Sunil Narine", "Varun Chakravarthy", "Luvnith Sisodia"
     ]
 }
+IPL_TEAM_CHOICES = {
+    "Chennai Super Kings":'static/CSK.png',
+    "Delhi Capitals": "static/DC.png",
+    "Gujarat Titans":"static/GT.png",
+    "Kolkata Knight Riders":'static/KKR.png',
+    "Lucknow Super Giants":'static/LSG.png',
+    "Mumbai Indians":'static/MI.png',
+    "Punjab Kings":'static/PBKS.png',
+    "Rajasthan Royals":'static/RR.png',
+    "Royal Challengers Bengaluru":'static/RCB.png',
+    "Sunrisers Hyderabad":'static/SRH.png',
+}
+IPL_TEAM_HEX_CODES = {
+    "Chennai Super Kings": "#FBB829",         # Golden Yellow
+    "Delhi Capitals": "#004C98",              # Deep Blue
+    "Gujarat Titans": "#0A369D",              # Strong Blue
+    "Kolkata Knight Riders": "#3E2A94",        # Deep Purple
+    "Lucknow Super Giants": "#5C2D91",         # Rich Purple
+    "Mumbai Indians": "#003A6C",               # Navy Blue
+    "Punjab Kings": "#D71920",                # Bold Red
+    "Rajasthan Royals": "#1C3C6C",            # Royal Blue (with a slight maroon influence)
+    "Royal Challengers Bengaluru": "#DA291C",  # Vivid Red
+    "Sunrisers Hyderabad": "#FF9933"           # Bright Orange
+}
 
 def predict_fantasy_points(request):
     if request.method == 'POST':
-        form = TeamForm(request.POST)
-        if form.is_valid():
-            # Get inputs from the POST request (sent from the webpage)
-            player_names = [player for player in ipl_2025_squads[form.cleaned_data['team1']]+ipl_2025_squads[form.cleaned_data['team2']]]
-            venue = form.cleaned_data['venue']
-            season = 2025
-            top_totals = []
-            # Preprocess the inputs
+        # Get data directly from POST request
+        team1 = request.POST.get("team1")  # Selected Team 1
+        team2 = request.POST.get("team2")  # Selected Team 2
+        venue = IPL_TEAM_HOME_GROUNDS[team1]  # Selected Venue
+        season = 2025  # Hardcoded season (can be dynamically set later)
+
+        # Validate input data (ensure teams and venue are not None)
+        if not team1 or not team2 or not venue:
+            return render(request, "team_selector.html", {
+                "error": "Please select both teams and a venue.",
+                "team1_choices": IPL_TEAM_CHOICES,
+                "team2_choices": IPL_TEAM_CHOICES,
+                "colours": IPL_TEAM_HEX_CODES,
+            })
+
+        # Process players from both selected teams
+        player_names = ipl_2025_squads[team1] + ipl_2025_squads[team2]
+        top_totals = []
+
+        try:
+            # Preprocess the inputs and make predictions for each player
             for player in player_names:
-                batting_x, _ = preprocessor.get_batting_data(player, venue, season)
-                bowling_x, _ = preprocessor.get_bowling_data(player, venue, season)
+                batting_x, _ = preprocessor.get_batting_data(player, venue, season)  # Preprocess batting data
+                bowling_x, _ = preprocessor.get_bowling_data(player, venue, season)  # Preprocess bowling data
 
                 with torch.no_grad():
                     batting_x = batting_x.to(device)
@@ -111,14 +160,34 @@ def predict_fantasy_points(request):
                     # Predict batting and bowling points
                     batting_points = batting_model(batting_x).item()
                     bowling_points = bowling_model(bowling_x).item()
-                top_totals.append((player,batting_points+bowling_points))
-            top_totals.sort(key=lambda x: x[1],reverse=True)
 
+                # Combine batting and bowling points
+                total_points = batting_points + bowling_points
+                top_totals.append((player, total_points))
 
-            # Return predictions as JSON
-            return render(request,"predicton.html" , {"players" : top_totals[:11]})
-    else :
-        form = TeamForm()
-    # Render a simple form to take inputs from the user
-    return render(request, 'team_selector.html', {"form":form})
+            # Sort players by total points (descending) and filter the top 11
+            top_totals.sort(key=lambda x: x[1], reverse=True)
+            top_11_players = top_totals[:11]
+
+            print(top_11_players)
+            # Render the predictions page
+            return render(request, "prediction.html", {"players": top_11_players})
+
+        except Exception as e:
+            # Handle any unexpected errors
+            print(f"Error processing predictions: {str(e)}")
+            return render(request, "team_selector.html", {
+                "error": "An issue occurred while processing predictions. Please try again.",
+                "team1_choices": IPL_TEAM_CHOICES,
+                "team2_choices": IPL_TEAM_CHOICES,
+                "colours": IPL_TEAM_HEX_CODES,
+            })
+
+    # Render team selector form (GET request)
+    return render(request, "team_selector.html", {
+        "team1_choices": IPL_TEAM_CHOICES,
+        "team2_choices": IPL_TEAM_CHOICES,
+        "colours": IPL_TEAM_HEX_CODES,
+    })
+
 

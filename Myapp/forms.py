@@ -12,22 +12,21 @@ IPL_TEAM_CHOICES = [
     ("Sunrisers Hyderabad", "Sunrisers Hyderabad"),
 ]
 IPL_VENUE_CHOICES = [
-    ("M. A. Chidambaram Stadium, Chennai", "M. A. Chidambaram Stadium, Chennai"),
+    ("MA Chidambaram Stadium, Chepauk, Chennai", "MA Chidambaram Stadium, Chepauk, Chennai"),
     ("Wankhede Stadium, Mumbai", "Wankhede Stadium, Mumbai"),
     ("Eden Gardens, Kolkata", "Eden Gardens, Kolkata"),
     ("Arun Jaitley Stadium, Delhi", "Arun Jaitley Stadium, Delhi"),
-    ("ACA–VDCA Cricket Stadium, Visakhapatnam", "ACA–VDCA Cricket Stadium, Visakhapatnam"),
-    ("M. Chinnaswamy Stadium, Bengaluru", "M. Chinnaswamy Stadium, Bengaluru"),
-    ("Rajiv Gandhi International Stadium, Hyderabad", "Rajiv Gandhi International Stadium, Hyderabad"),
-    ("Narendra Modi Stadium, Ahmedabad", "Narendra Modi Stadium, Ahmedabad"),
+    ("Dr. Y.S. Rajasekhara Reddy ACA-VDCA Cricket Stadium, Visakhapatnam", "Dr. Y.S. Rajasekhara Reddy ACA-VDCA Cricket Stadium, Visakhapatnam"),
+    ("M.Chinnaswamy Stadium, Bengaluru", "M.Chinnaswamy Stadium, Bengaluru"),
+    ("Rajiv Gandhi International Stadium, Uppal, Hyderabad", "Rajiv Gandhi International Stadium, Uppal, Hyderabad"),
+    ("Narendra Modi Stadium, Motera, Ahmedabad", "Narendra Modi Stadium, Motera, Ahmedabad"),
     ("Sawai Mansingh Stadium, Jaipur", "Sawai Mansingh Stadium, Jaipur"),
     ("Barsapara Cricket Stadium, Guwahati", "Barsapara Cricket Stadium, Guwahati"),
-    ("PCA Stadium, Mohali", "PCA Stadium, Mohali"),
-    ("HPCA Stadium, Dharamsala", "HPCA Stadium, Dharamsala"),
+    ("Punjab Cricket Association IS Bindra Stadium, Mohali, Chandigarh", "Punjab Cricket Association IS Bindra Stadium, Mohali, Chandigarh"),
+    ("Himachal Pradesh Cricket Association Stadium, Dharamsala", "Himachal Pradesh Cricket Association Stadium, Dharamsala"),
     ("Maharaja Yadavindra Singh Stadium, Mullanpur", "Maharaja Yadavindra Singh Stadium, Mullanpur"),
-    ("Ekana Cricket Stadium, Lucknow", "Ekana Cricket Stadium, Lucknow"),
+    ("Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium, Lucknow", "Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium, Lucknow"),
 ]
 class TeamForm(forms.Form):
     team1 = forms.ChoiceField(choices=IPL_TEAM_CHOICES)
     team2 = forms.ChoiceField(choices=IPL_TEAM_CHOICES)
-    venue = forms.ChoiceField(choices=IPL_VENUE_CHOICES)

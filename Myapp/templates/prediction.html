@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fantasy Cricket Player Predictions</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom Styles -->
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+            max-width: 800px;
+        }
+        .header-title {
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: bold;
+            color: #343a40;
+        }
+        .player-card {
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .player-name {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #495057;
+        }
+        .player-score {
+            font-size: 1rem;
+            color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <!-- Main Container -->
+    <div class="container">
+        <h1 class="header-title">Fantasy Cricket Player Predictions</h1>
+
+        <!-- Player Cards -->
+        {% for player, score in players %}
+        <div class="player-card">
+            <p class="player-name">{{ player }}</p>
+            <p class="player-score">Score: {{ score }}</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

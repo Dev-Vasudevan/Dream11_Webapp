@@ -2,15 +2,153 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Team Selector</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fantasy Cricket Team Selector</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom Styles -->
+    <style>
+        body {
+            background-color: linear-gradient(to right, #f8f9fa, #f8f9fa); /* Default background color */
+            transition: background-color 0.3s ease; /* Smooth transition for background color */
+        }
+        .team-container.selected {
+            border: 2px solid currentColor; /* Outline the selected team's color */
+        }
+        .container {
+            margin-top: 20px;
+
+        }
+        .form-container{
+            display: flex;
+            justify-content: center;
+        }
+        .team-selector {
+
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #ffffff;
+            max-width: 860px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .team-logo {
+            width: 100px;
+            height: auto;
+            margin-bottom: 10px;
+        }
+        .team-container {
+            width: 400px;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .team-container:hover {
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+        .btn-custom {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-custom:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
- <h2> HELLO WORLD </h2>
+    <div class="container">
+        <!-- Page Header -->
+        <h1 class="text-center mb-4">Fantasy Cricket Team Selector</h1>
+        <div class = "form-container">
+        <!-- Team Selection Form -->
+        <form method="POST" class="team-selector">
+            {% csrf_token %}
 
-<form method = "POST">
-    {%  csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Submit</button>
-</form>
+            <!-- Team Selection -->
+            <div class="row">
+                <!-- Team 1 Selection -->
+                <div class="col-md-6" id="team1-column">
+                    <h3 class="text-center">Home Team
+                    </h3>
+                    <input type="hidden" name="team1" id="selected-team1"> <!-- Hidden field for Team 1 -->
+                    {% for team_name, team_logo in team1_choices.items %}
+                    <div class="team-container" onclick="selectTeam('team1', '{{ team_name }}', this)">
+                        <img src="{{ team_logo }}" alt="{{ team_name }} Logo" class="team-logo">
+                        <p>{{ team_name }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Team 2 Selection -->
+                <div class="col-md-6" id="team2-column">
+                    <h3 class="text-center">Away Team</h3>
+                    <input type="hidden" name="team2" id="selected-team2"> <!-- Hidden field for Team 2 -->
+                    {% for team_name, team_logo in team2_choices.items %}
+                    <div class="team-container" onclick="selectTeam('team2', '{{ team_name }}', this)">
+                        <img src="{{ team_logo }}" alt="{{ team_name }} Logo" class="team-logo">
+                        <p>{{ team_name }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-custom">Submit Teams</button>
+            </div>
+        </form>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- JavaScript for Dynamic Outlines -->
+    <script>
+        const teamColors = {{ colours|safe }}; // Pass IPL_TEAM_HEX_CODES dictionary from Django context
+let selectedTeam1Color = '#f8f9fa'; // Default color for Team 1
+let selectedTeam2Color = '#f8f9fa'; // Default color for Team 2
+
+function selectTeam(teamField, teamName, element) {
+    // Update hidden input field with the selected team
+    const teamFieldInput = document.getElementById(`selected-${teamField}`);
+    teamFieldInput.value = teamName;
+
+    // Get the column ID based on the team field
+    const columnId = teamField === 'team1' ? 'team1-column' : 'team2-column';
+
+    // Find all containers within the relevant column and remove their "selected" class
+    const columnContainer = document.getElementById(columnId);
+    const containers = columnContainer.querySelectorAll('.team-container');
+    containers.forEach(container => container.classList.remove('selected'));
+
+    // Add "selected" class to the clicked container
+    element.classList.add('selected');
+
+    // Change the border color of the selected container based on the team's color
+    element.style.borderColor = teamColors[teamName];
+
+    // Update the selected team's color
+    if (teamField === 'team1') {
+        selectedTeam1Color = teamColors[teamName];
+    } else if (teamField === 'team2') {
+        selectedTeam2Color = teamColors[teamName];
+    }
+
+    // Update the gradient background
+    document.body.style.background = `linear-gradient(to right, ${selectedTeam1Color}, ${selectedTeam2Color})`;
+}
+
+    </script>
 </body>
 </html>
